@@ -12,10 +12,10 @@
 <header class="topbar">
   <div class="left-head">
     <button class="icon-btn" id="menuToggle" aria-label="Toggle sidebar">☰</button>
-    <a class="brand" href="#" aria-label="BluTuub home"><span class="brand-mark">▶</span><span>BluTuub</span></a>
+    <a class="brand" href="#" aria-label="BluTuub home"><svg class="brand-mark" viewBox="0 0 40 28" role="img" aria-label=""><rect x="1" y="1" width="38" height="26" rx="8" fill="#1769e0"/><path d="M17 8.2 27 14 17 19.8Z" fill="#fff"/><path d="M6 5h3v18H6z" fill="#8ec5ff" opacity=".9"/></svg><span class="brand-name">BluTuub</span></a>
   </div>
   <form class="search" id="searchForm"><input id="searchInput" type="search" placeholder="Search" aria-label="Search videos"><button type="submit" aria-label="Search">⌕</button></form>
-  <div class="head-actions"><button class="create-btn" id="openUpload"><span>＋</span> Create</button><button class="profile" aria-label="BluTuub profile">B</button></div>
+  <div class="head-actions"><button class="create-btn" id="openUpload"><span>＋</span> Create</button><button class="profile" id="profileButton" aria-label="Open profile menu" aria-expanded="false"><span class="profile-avatar" id="profileAvatar">A</span></button></div>
 </header>
 <aside class="sidebar" id="sidebar">
   <div class="nav-group">
@@ -77,6 +77,25 @@
  </section>
 </div>
 <div class="modal-backdrop hidden" id="playerModal" role="dialog" aria-modal="true" aria-label="Video player"><section class="modal player-modal"><button class="close-btn" data-close="playerModal" aria-label="Close">×</button><div id="playerContent"></div></section></div>
+<div class="profile-menu hidden" id="profileMenu" role="menu">
+  <div class="profile-menu-head"><div class="profile-avatar profile-avatar-large" id="menuAvatar">A</div><div><strong id="menuDisplayName">BluTuub User</strong><span id="menuHandle">@blutuubuser</span></div></div>
+  <button id="switchProfile" role="menuitem">Switch account</button>
+  <button id="editProfile" role="menuitem">Edit profile</button>
+  <button id="signOutProfile" role="menuitem">Reset profile</button>
+</div>
+<div class="modal-backdrop hidden" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+ <section class="modal profile-modal">
+  <div class="modal-head"><h2 id="profileTitle">Your BluTuub profile</h2><button class="close-btn" data-close="profileModal" aria-label="Close">×</button></div>
+  <form id="profileForm">
+   <div class="profile-preview"><div class="profile-avatar profile-avatar-large" id="profilePreviewAvatar">A</div><div><strong id="profilePreviewName">BluTuub User</strong><p>Your name and avatar appear beside your videos.</p></div></div>
+   <label class="field-label" for="displayNameInput">Display name</label><input class="text-field" id="displayNameInput" maxlength="32" placeholder="Your name" required>
+   <label class="field-label" for="handleInput">Username</label><input class="text-field" id="handleInput" maxlength="24" placeholder="username" required>
+   <label class="field-label" for="avatarColorInput">Avatar color</label><input class="color-field" type="color" id="avatarColorInput" value="#1769e0">
+   <button class="blue-btn full-btn" type="submit">Save profile</button>
+  </form>
+  <div class="switch-list hidden" id="switchList"><p>Choose a saved profile on this device</p><div id="savedProfiles"></div><button class="blue-btn full-btn" id="addProfile" type="button">＋ Add another profile</button></div>
+ </section>
+</div>
 <div class="toast hidden" id="toast" role="status"></div>
 <script src="script.js"></script>
 </body>
