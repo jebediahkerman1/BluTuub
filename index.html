@@ -66,7 +66,9 @@
  <section class="modal">
   <div class="modal-head"><h2 id="uploadTitle">Upload videos</h2><button class="close-btn" data-close="uploadModal" aria-label="Close">×</button></div>
   <form id="uploadForm">
-   <label class="file-drop" for="videoFile"><span class="file-icon">↑</span><strong id="fileLabel">Select video files</strong><small>Choose a video from your device</small><input type="file" id="videoFile" accept="video/*" required></label>
+   <label class="file-drop" for="videoFile"><span class="file-icon">↑</span><strong id="fileLabel">Select a video</strong><small>Choose a video from your device</small><input type="file" id="videoFile" accept="video/*" required></label>
+   <label class="field-label" for="thumbnailFile">Custom thumbnail (optional)</label><input class="text-field" type="file" id="thumbnailFile" accept="image/jpeg,image/png,image/webp">
+   <p class="note">AI checks the title, description, thumbnail, and 4 sampled frames from the video. It can miss content between frames and does not check audio. Videos remain local to this browser session.</p>
    <label class="field-label" for="videoTitle">Title</label><input class="text-field" id="videoTitle" maxlength="100" placeholder="Add a title that describes your video" required>
    <label class="field-label" for="videoDescription">Description</label><textarea class="text-field" id="videoDescription" maxlength="1000" placeholder="Tell viewers about your video"></textarea>
    <label class="field-label" for="videoCategory">Category</label><select class="text-field" id="videoCategory"><option>Other</option><option>Gaming</option><option>Comedy</option><option>Music</option><option>Education</option><option>Animation</option></select>
