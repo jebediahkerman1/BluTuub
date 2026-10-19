@@ -49,8 +49,8 @@ async function handleAuthSubmit(event){event.preventDefault();if(!firebaseConfig
 
 loadProfiles();
 initFirebaseAuth();
-$("profileButton").addEventListener("click",e=>{e.stopPropagation();const menu=$("profileMenu");menu.classList.toggle("hidden");$("profileButton").setAttribute("aria-expanded",String(!menu.classList.contains("hidden")));});
-document.addEventListener("click",e=>{if(!$("profileMenu").contains(e.target)&&e.target!==$("profileButton")){$("profileMenu").classList.add("hidden");$("profileButton").setAttribute("aria-expanded","false");}});
+$("profileButton").addEventListener("click",e=>{e.preventDefault();e.stopPropagation();const menu=$("profileMenu");const opening=menu.classList.contains("hidden");menu.classList.toggle("hidden",!opening);$("profileButton").setAttribute("aria-expanded",String(opening));});
+document.addEventListener("click",e=>{if(!$("profileMenu").contains(e.target)&&!$("profileButton").contains(e.target)){$("profileMenu").classList.add("hidden");$("profileButton").setAttribute("aria-expanded","false");}});
 $("editProfile").addEventListener("click",()=>{$("profileMenu").classList.add("hidden");if(onlineUser&&firebaseAuth){const p=activeProfile();$("displayNameInput").value=p.name;$("handleInput").value=p.handle;$("avatarColorInput").value=p.color;showProfileEditor(false);}else{showProfileEditor(false);}});
 $("switchProfile").addEventListener("click",()=>{$("profileMenu").classList.add("hidden");if(firebaseAuth){openAuth();}else{showProfileEditor(true);}});
 $("onlineAccountAction").addEventListener("click",()=>{$("profileMenu").classList.add("hidden");openAuth();});
