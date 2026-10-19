@@ -108,12 +108,14 @@
    <div id="authMessage" class="auth-message hidden" role="status"></div>
    <button class="blue-btn full-btn" id="authSubmit" type="submit">Sign in</button>
   </form>
-  <p class="auth-footnote">Online accounts require BluTuub's Supabase project to be configured.</p>
+  <p class="auth-footnote">Online accounts require Firebase Authentication and Firestore to be configured.</p>
  </section>
 </div>
 <div class="toast hidden" id="toast" role="status"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
