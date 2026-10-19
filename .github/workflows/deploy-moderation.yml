@@ -1,0 +1,45 @@
+name: Deploy BluTuub AI moderation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Install Firebase CLI
+        run: npm install --global firebase-tools
+
+      - name: Install function dependencies
+        run: npm install --prefix functions
+
+      - name: Set OpenAI key as a Firebase secret
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "The OPENAI_API_KEY GitHub Actions secret is missing."
+            exit 1
+          fi
+          printf '%s' "$OPENAI_API_KEY" > "$RUNNER_TEMP/openai-key.txt"
+          firebase functions:secrets:set OPENAI_API_KEY --data-file "$RUNNER_TEMP/openai-key.txt" --project blutuub-1831a --force
+          rm -f "$RUNNER_TEMP/openai-key.txt"
+
+      - name: Deploy moderation function
+        run: firebase deploy --only functions --project blutuub-1831a
