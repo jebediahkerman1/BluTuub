@@ -36,3 +36,15 @@
 .auth-message{font-size:13px;line-height:1.5;border-radius:8px;padding:11px;margin-top:14px;background:#e7f4fd;color:#075d9a}
 .auth-message.error{background:#fff0f0;color:#b42318}
 .auth-footnote{font-size:12px;color:#606060;line-height:1.5;margin:16px 0 0}
+
+
+/* Right-side black account drawer */
+.profile-menu{position:fixed;z-index:45;top:56px;right:0;bottom:0;width:320px;max-width:88vw;padding:0 0 24px;background:#080808;color:#fff;border:0;border-left:1px solid #292929;border-radius:0;box-shadow:-8px 0 28px #0003;overflow-y:auto}
+.profile-panel-title{font-size:18px;font-weight:700;padding:22px 20px 18px;border-bottom:1px solid #292929}
+.profile-menu-head{padding:20px 18px;border-bottom:1px solid #292929;margin:0 0 10px}
+.profile-menu-head strong{color:#fff}
+.profile-menu-head span{color:#bdbdbd}
+.profile-menu>button{display:flex;align-items:center;gap:14px;width:100%;min-height:52px;padding:14px 20px;background:#080808;color:#fff;text-align:left;font-size:15px;border:0}
+.profile-menu>button:hover{background:#242424}
+.account-menu-icon{display:inline-grid;place-items:center;width:24px;font-size:21px;color:#fff}
+@media(max-width:600px){.profile-menu{top:56px;right:0;bottom:0;width:min(320px,88vw);max-width:88vw;border-radius:0}}
