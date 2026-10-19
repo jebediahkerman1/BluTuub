@@ -35,19 +35,52 @@ function closeModal(id){$(id).classList.add("hidden");document.body.style.overfl
 function toast(message){$("toast").textContent=message;$("toast").classList.remove("hidden");clearTimeout(toast.timer);toast.timer=setTimeout(()=>$("toast").classList.add("hidden"),3000);}
 function showUpload(){$("moderationResult").className="moderation-result hidden";openModal("uploadModal");}
 const MODERATION_ENDPOINT="https://us-central1-blutuub-1831a.cloudfunctions.net/moderateUpload";
-async function moderateText(title,description){
+function imageFileToJpeg(file){
+ return new Promise((resolve,reject)=>{
+  const url=URL.createObjectURL(file),img=new Image();
+  img.onload=()=>{try{const canvas=document.createElement("canvas"),scale=Math.min(1,320/img.naturalWidth,320/img.naturalHeight);canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));canvas.getContext("2d",{alpha:false}).drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL("image/jpeg",0.42));}catch(e){reject(e);}finally{URL.revokeObjectURL(url);}};
+  img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error("Could not read the thumbnail image."));};
+  img.src=url;
+ });
+}
+function sampleVideoFrames(file){
+ return new Promise((resolve,reject)=>{
+  const video=document.createElement("video"),url=URL.createObjectURL(file),frames=[];
+  video.preload="metadata";video.muted=true;video.playsInline=true;
+  const cleanup=()=>{video.removeAttribute("src");video.load();URL.revokeObjectURL(url);};
+  video.onerror=()=>{cleanup();reject(new Error("Could not read this video to check its frames."));};
+  video.onloadedmetadata=async()=>{
+   try{
+    if(!Number.isFinite(video.duration)||video.duration<=0)throw new Error("This video has no readable duration.");
+    const canvas=document.createElement("canvas"),ctx=canvas.getContext("2d",{alpha:false});
+    const scale=Math.min(1,320/video.videoWidth,320/video.videoHeight);
+    canvas.width=Math.max(1,Math.round(video.videoWidth*scale));canvas.height=Math.max(1,Math.round(video.videoHeight*scale));
+    const positions=[0.1,0.35,0.6,0.85].map(p=>Math.min(Math.max(0,video.duration-0.08),video.duration*p));
+    for(const time of positions){
+     await new Promise((res,rej)=>{const fail=()=>{video.removeEventListener("seeked",done);rej(new Error("Could not sample a frame from the video."));};const done=()=>{video.removeEventListener("error",fail);res();};video.addEventListener("seeked",done,{once:true});video.addEventListener("error",fail,{once:true});video.currentTime=time;});
+     ctx.drawImage(video,0,0,canvas.width,canvas.height);frames.push(canvas.toDataURL("image/jpeg",0.38));
+    }
+    cleanup();resolve(frames);
+   }catch(e){cleanup();reject(e);}
+  };
+  video.src=url;
+ });
+}
+async function moderateText(title,description,thumbnailFile,videoFile){
  if(title.trim().length<3)return {ok:false,message:"Please enter a longer title."};
  if(title.length>100||description.length>1000)return {ok:false,message:"Title must be 100 characters or fewer and description 1,000 characters or fewer."};
  if(!firebaseAuth||!firebaseAuth.currentUser)return {ok:false,message:"Sign in to BluTuub first to use AI moderation."};
  try{
+  const frames=await sampleVideoFrames(videoFile);
+  const thumbnail=thumbnailFile?await imageFileToJpeg(thumbnailFile):frames[0];
   const token=await firebaseAuth.currentUser.getIdToken();
-  const response=await fetch(MODERATION_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({title,description})});
+  const response=await fetch(MODERATION_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({title,description,thumbnail,frames})});
   const data=await response.json().catch(()=>({}));
-  if(!response.ok)return {ok:false,message:data.error||"AI moderation is not set up yet. Your video was not added."};
+  if(!response.ok)return {ok:false,message:data.error||"AI moderation is not set up yet. Your upload was not added."};
   return {ok:!!data.ok,message:data.message||"AI moderation returned no explanation.",flagged:!!data.flagged,categories:Array.isArray(data.categories)?data.categories:[]};
  }catch(error){
   console.error("AI moderation request failed:",error);
-  return {ok:false,message:"Couldn't reach AI moderation. Your video was not added. The backend may still need to be deployed."};
+  return {ok:false,message:error.message||"Couldn't check this video. Your upload was not added."};
  }
 }
 function showModeration(ok,message){const el=$("moderationResult");el.className="moderation-result";el.textContent=(ok?"✓ ":"⚠ ")+message;}
@@ -90,6 +123,6 @@ document.querySelectorAll(".modal-backdrop").forEach(el=>el.addEventListener("cl
 document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".modal-backdrop:not(.hidden)").forEach(m=>closeModal(m.id));if((e.key==="Enter"||e.key===" ")&&e.target.matches("[data-video-id]")){e.preventDefault();openPlayer(e.target.dataset.videoId);}});
 $("menuToggle").addEventListener("click",()=>$("sidebar").classList.toggle("open"));
 $("videoGrid").addEventListener("click",e=>{const card=e.target.closest("[data-video-id]");if(card)openPlayer(card.dataset.videoId);});
-$("videoFile").addEventListener("change",()=>{$("fileLabel").textContent=$("videoFile").files[0]?.name||"Select video files";});
-$("uploadForm").addEventListener("submit",async e=>{e.preventDefault();const file=$("videoFile").files[0],title=$("videoTitle").value.trim(),desc=$("videoDescription").value.trim(),category=$("videoCategory").value,submitButton=$("uploadForm").querySelector('button[type="submit"]');if(!file){toast("Choose a video first.");return;}if(!file.type.startsWith("video/")){showModeration(false,"Please choose a video file.");return;}submitButton.disabled=true;submitButton.textContent="Checking with AI…";showModeration(true,"Checking title and description with AI moderation…");try{const result=await moderateText(title,desc);if(!result.ok){showModeration(false,result.message+(result.categories?.length?" Categories: "+result.categories.join(", "):""));return;}const objectUrl=URL.createObjectURL(file);uploadedVideos.unshift({id:"upload-"+Date.now(),title,desc,category,channel:activeProfile().name,views:0,userUpload:true,objectUrl});showModeration(true,result.message+" Video added to this browser session only; it is not uploaded to a server.");currentView="home";showMine=false;currentFilter="All";searchQuery="";$("searchInput").value="";renderVideos();}finally{submitButton.disabled=false;submitButton.textContent="Check and add video";}});
+$("videoFile").addEventListener("change",()=>{$("fileLabel").textContent=$("videoFile").files[0]?.name||"Select a video";});
+$("uploadForm").addEventListener("submit",async e=>{e.preventDefault();const file=$("videoFile").files[0],title=$("videoTitle").value.trim(),desc=$("videoDescription").value.trim(),category=$("videoCategory").value,submitButton=$("uploadForm").querySelector('button[type="submit"]');if(!file){toast("Choose a video first.");return;}if(!file.type.startsWith("video/")){showModeration(false,"Please choose a video file.");return;}submitButton.disabled=true;submitButton.textContent="Checking with AI…";showModeration(true,"Checking title, thumbnail, and sampled video frames with AI…");try{const result=await moderateText(title,desc,$("thumbnailFile").files[0]||null,file);if(!result.ok){showModeration(false,result.message+(result.categories?.length?" Categories: "+result.categories.join(", "):""));return;}const objectUrl=URL.createObjectURL(file);uploadedVideos.unshift({id:"upload-"+Date.now(),title,desc,category,channel:activeProfile().name,views:0,userUpload:true,objectUrl});showModeration(true,result.message+" Title, thumbnail, and 4 sampled frames passed. The video is still local to this browser session.");currentView="home";showMine=false;currentFilter="All";searchQuery="";$("searchInput").value="";renderVideos();}finally{submitButton.disabled=false;submitButton.textContent="Check and add video";}});
 renderVideos();
