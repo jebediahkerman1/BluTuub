@@ -81,7 +81,8 @@
   <div class="profile-menu-head"><div class="profile-avatar profile-avatar-large" id="menuAvatar">A</div><div><strong id="menuDisplayName">BluTuub User</strong><span id="menuHandle">@blutuubuser</span></div></div>
   <button id="switchProfile" role="menuitem">Switch account</button>
   <button id="editProfile" role="menuitem">Edit profile</button>
-  <button id="signOutProfile" role="menuitem">Add another profile</button>
+  <button id="signOutProfile" role="menuitem">Sign out</button>
+  <button id="onlineAccountAction" role="menuitem">Sign in / Create account</button>
 </div>
 <div class="modal-backdrop hidden" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
  <section class="modal profile-modal">
@@ -96,7 +97,23 @@
   <div class="switch-list hidden" id="switchList"><p>Choose a saved profile on this device</p><div id="savedProfiles"></div><button class="blue-btn full-btn" id="addProfile" type="button">＋ Add another profile</button></div>
  </section>
 </div>
+<div class="modal-backdrop hidden" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+ <section class="modal auth-modal">
+  <div class="modal-head"><h2 id="authTitle">Welcome to BluTuub</h2><button class="close-btn" data-close="authModal" aria-label="Close">×</button></div>
+  <div class="auth-tabs"><button class="auth-tab active" id="loginTab" type="button">Sign in</button><button class="auth-tab" id="signupTab" type="button">Create account</button></div>
+  <form id="authForm">
+   <label class="field-label" for="authEmail">Email</label><input class="text-field" id="authEmail" type="email" autocomplete="email" placeholder="you@example.com" required>
+   <label class="field-label" for="authPassword">Password</label><input class="text-field" id="authPassword" type="password" autocomplete="current-password" minlength="6" placeholder="At least 6 characters" required>
+   <div id="signupNameField" class="hidden"><label class="field-label" for="authName">Display name</label><input class="text-field" id="authName" maxlength="32" autocomplete="name" placeholder="Your name"></div>
+   <div id="authMessage" class="auth-message hidden" role="status"></div>
+   <button class="blue-btn full-btn" id="authSubmit" type="submit">Sign in</button>
+  </form>
+  <p class="auth-footnote">Online accounts require BluTuub's Supabase project to be configured.</p>
+ </section>
+</div>
 <div class="toast hidden" id="toast" role="status"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
