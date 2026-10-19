@@ -34,7 +34,22 @@ function openModal(id){$(id).classList.remove("hidden");document.body.style.over
 function closeModal(id){$(id).classList.add("hidden");document.body.style.overflow=(["uploadModal","playerModal","profileModal","authModal"].every(mid=>$(mid).classList.contains("hidden")))?"":"hidden";}
 function toast(message){$("toast").textContent=message;$("toast").classList.remove("hidden");clearTimeout(toast.timer);toast.timer=setTimeout(()=>$("toast").classList.add("hidden"),3000);}
 function showUpload(){$("moderationResult").className="moderation-result hidden";openModal("uploadModal");}
-function moderateText(title,description){const combined=(title+" "+description).toLowerCase();const terms=["i will kill you","i'm going to kill you","bomb threat","shoot up the school","dox this person","go harass","find their home address","free money click here","guaranteed crypto profit","send me your password","buy followers instantly"];if(terms.some(term=>combined.includes(term)))return {ok:false,message:"Held for review by the basic demo text filter."};if(title.trim().length<3)return {ok:false,message:"Please enter a longer title."};return {ok:true,message:"The basic demo text check passed. This is not real AI moderation."};}
+const MODERATION_ENDPOINT="https://us-central1-blutuub-1831a.cloudfunctions.net/moderateUpload";
+async function moderateText(title,description){
+ if(title.trim().length<3)return {ok:false,message:"Please enter a longer title."};
+ if(title.length>100||description.length>1000)return {ok:false,message:"Title must be 100 characters or fewer and description 1,000 characters or fewer."};
+ if(!firebaseAuth||!firebaseAuth.currentUser)return {ok:false,message:"Sign in to BluTuub first to use AI moderation."};
+ try{
+  const token=await firebaseAuth.currentUser.getIdToken();
+  const response=await fetch(MODERATION_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({title,description})});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)return {ok:false,message:data.error||"AI moderation is not set up yet. Your video was not added."};
+  return {ok:!!data.ok,message:data.message||"AI moderation returned no explanation.",flagged:!!data.flagged,categories:Array.isArray(data.categories)?data.categories:[]};
+ }catch(error){
+  console.error("AI moderation request failed:",error);
+  return {ok:false,message:"Couldn't reach AI moderation. Your video was not added. The backend may still need to be deployed."};
+ }
+}
 function showModeration(ok,message){const el=$("moderationResult");el.className="moderation-result";el.textContent=(ok?"✓ ":"⚠ ")+message;}
 function openPlayer(id){const v=uploadedVideos.find(x=>x.id===id);if(!v)return;viewedIds.push(id);$("playerContent").innerHTML=`<video class="player-video" controls autoplay src="${v.objectUrl}"></video><div class="player-details"><h2>${escapeHtml(v.title)}</h2><p>${escapeHtml(v.channel)} · ${v.views} views</p><p>${escapeHtml(v.desc||"")}</p></div>`;openModal("playerModal");}
 
@@ -76,5 +91,5 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelect
 $("menuToggle").addEventListener("click",()=>$("sidebar").classList.toggle("open"));
 $("videoGrid").addEventListener("click",e=>{const card=e.target.closest("[data-video-id]");if(card)openPlayer(card.dataset.videoId);});
 $("videoFile").addEventListener("change",()=>{$("fileLabel").textContent=$("videoFile").files[0]?.name||"Select video files";});
-$("uploadForm").addEventListener("submit",e=>{e.preventDefault();const file=$("videoFile").files[0],title=$("videoTitle").value.trim(),desc=$("videoDescription").value.trim(),category=$("videoCategory").value;if(!file){toast("Choose a video first.");return;}if(!file.type.startsWith("video/")){showModeration(false,"Please choose a video file.");return;}const result=moderateText(title,desc);if(!result.ok){showModeration(false,result.message);return;}const objectUrl=URL.createObjectURL(file);uploadedVideos.unshift({id:"upload-"+Date.now(),title,desc,category,channel:activeProfile().name,views:0,userUpload:true,objectUrl});showModeration(true,"Passed the basic demo text check. Added to this browser session only; it is not uploaded to a server or reviewed by real AI.");currentView="home";showMine=false;currentFilter="All";searchQuery="";$("searchInput").value="";renderVideos();});
+$("uploadForm").addEventListener("submit",async e=>{e.preventDefault();const file=$("videoFile").files[0],title=$("videoTitle").value.trim(),desc=$("videoDescription").value.trim(),category=$("videoCategory").value,submitButton=$("uploadForm").querySelector('button[type="submit"]');if(!file){toast("Choose a video first.");return;}if(!file.type.startsWith("video/")){showModeration(false,"Please choose a video file.");return;}submitButton.disabled=true;submitButton.textContent="Checking with AI…";showModeration(true,"Checking title and description with AI moderation…");try{const result=await moderateText(title,desc);if(!result.ok){showModeration(false,result.message+(result.categories?.length?" Categories: "+result.categories.join(", "):""));return;}const objectUrl=URL.createObjectURL(file);uploadedVideos.unshift({id:"upload-"+Date.now(),title,desc,category,channel:activeProfile().name,views:0,userUpload:true,objectUrl});showModeration(true,result.message+" Video added to this browser session only; it is not uploaded to a server.");currentView="home";showMine=false;currentFilter="All";searchQuery="";$("searchInput").value="";renderVideos();}finally{submitButton.disabled=false;submitButton.textContent="Check and add video";}});
 renderVideos();
