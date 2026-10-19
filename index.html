@@ -15,7 +15,7 @@
     <a class="brand" href="#" aria-label="BluTuub home"><svg class="brand-mark" viewBox="0 0 40 28" role="img" aria-label=""><rect x="1" y="1" width="38" height="26" rx="8" fill="#1769e0"/><path d="M17 8.2 27 14 17 19.8Z" fill="#fff"/><path d="M6 5h3v18H6z" fill="#8ec5ff" opacity=".9"/></svg><span class="brand-name">BluTuub</span></a>
   </div>
   <form class="search" id="searchForm"><input id="searchInput" type="search" placeholder="Search" aria-label="Search videos"><button type="submit" aria-label="Search">⌕</button></form>
-  <div class="head-actions"><button class="create-btn" id="openUpload"><span>＋</span> Create</button><button class="profile" id="profileButton" aria-label="Open profile menu" aria-expanded="false"><span class="profile-avatar" id="profileAvatar">A</span></button></div>
+  <div class="head-actions"><span id="aiStatus" class="ai-status" role="status" title="Cloud AI moderation status">AI: setup needed</span><button class="create-btn" id="openUpload"><span>＋</span> Create</button><button class="profile" id="profileButton" aria-label="Open profile menu" aria-expanded="false"><span class="profile-avatar" id="profileAvatar">A</span></button></div>
 </header>
 <aside class="sidebar" id="sidebar">
   <div class="nav-group">
@@ -68,11 +68,11 @@
   <form id="uploadForm">
    <label class="file-drop" for="videoFile"><span class="file-icon">↑</span><strong id="fileLabel">Select a video</strong><small>Choose a video from your device</small><input type="file" id="videoFile" accept="video/*" required></label>
    <label class="field-label" for="thumbnailFile">Custom thumbnail (optional)</label><input class="text-field" type="file" id="thumbnailFile" accept="image/jpeg,image/png,image/webp">
-   <p class="note">AI checks the title, description, thumbnail, and 4 sampled frames from the video. It can miss content between frames and does not check audio. Videos remain local to this browser session.</p>
+   <p class="note">Cloud AI checks the title, description, thumbnail, and 4 sampled video frames. It can miss content between frames and does not check audio. Videos remain local to this browser session.</p>
    <label class="field-label" for="videoTitle">Title</label><input class="text-field" id="videoTitle" maxlength="100" placeholder="Add a title that describes your video" required>
    <label class="field-label" for="videoDescription">Description</label><textarea class="text-field" id="videoDescription" maxlength="1000" placeholder="Tell viewers about your video"></textarea>
    <label class="field-label" for="videoCategory">Category</label><select class="text-field" id="videoCategory"><option>Other</option><option>Gaming</option><option>Comedy</option><option>Music</option><option>Education</option><option>Animation</option></select>
-   <p class="note">AI moderation checks the title and description after you sign in. Video files are still only previewed in this browser session; the video itself is not uploaded or checked.</p>
+   <p class="note">You do not need to sign in to run moderation. If the AI service is offline or rejects a request, the video will not be added. Videos are only previewed in this browser session; they are not uploaded or shared with other users.</p>
    <div id="moderationResult" class="moderation-result hidden" role="status"></div>
    <button class="blue-btn full-btn" type="submit">Check and add video</button>
   </form>
@@ -118,7 +118,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="script.js?v=profile-drawer-3"></script>
+<script src="moderation-config.js?v=1"></script>
+<script src="script.js?v=cloud-ai-moderation-1"></script>
 <script src="profile-menu.js?v=1"></script>
 </body>
 </html>
