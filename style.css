@@ -48,3 +48,11 @@
 .profile-menu>button:hover{background:#242424}
 .account-menu-icon{display:inline-grid;place-items:center;width:24px;font-size:21px;color:#fff}
 @media(max-width:600px){.profile-menu{top:56px;right:0;bottom:0;width:min(320px,88vw);max-width:88vw;border-radius:0}}
+
+
+/* Cloud AI moderation status */
+.ai-status{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:700;background:#f2f2f2;color:#606060;letter-spacing:.1px}
+.ai-status.online{background:#e7f6ec;color:#137333}
+.ai-status.offline{background:#fff0f0;color:#b42318}
+.ai-status.setup,.ai-status.checking{background:#fff6df;color:#805b00}
+@media(max-width:600px){.head-actions{gap:6px}.ai-status{font-size:10px;padding:6px 7px}.create-btn{padding:8px 9px}}
