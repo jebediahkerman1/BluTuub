@@ -37,7 +37,7 @@ function renderVideos(){
 function parseViews(s){const m=String(s).match(/[\d.]+/);if(!m)return 0;let n=Number(m[0]);if(/M/i.test(s))n*=1e6;else if(/K/i.test(s))n*=1e3;return n;}
 function setFilter(filter){currentFilter=filter;showMine=false;document.querySelectorAll("[data-filter]").forEach(el=>el.classList.toggle("selected",el.dataset.filter===filter));document.querySelectorAll(".nav-item[data-filter]").forEach(el=>el.classList.toggle("active",el.dataset.filter===filter));renderVideos();}
 function openModal(id){$(id).classList.remove("hidden");document.body.style.overflow="hidden";}
-function closeModal(id){$(id).classList.add("hidden");if(!$("uploadModal").classList.contains("hidden")===false&&$("playerModal").classList.contains("hidden")){}document.body.style.overflow=($("uploadModal").classList.contains("hidden")&&$("playerModal").classList.contains("hidden"))?"":"hidden";if(id==="playerModal"&&currentObjectUrl){URL.revokeObjectURL(currentObjectUrl);currentObjectUrl=null;}}
+function closeModal(id){$(id).classList.add("hidden");document.body.style.overflow=($("uploadModal").classList.contains("hidden")&&$("playerModal").classList.contains("hidden"))?"":"hidden";}
 function toast(message){$("toast").textContent=message;$("toast").classList.remove("hidden");clearTimeout(toast.timer);toast.timer=setTimeout(()=>$("toast").classList.add("hidden"),3200);}
 function openPlayer(id){
  const v=allVideos().find(x=>x.id===id);if(!v)return;
