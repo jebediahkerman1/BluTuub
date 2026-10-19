@@ -34,7 +34,19 @@ function openModal(id){$(id).classList.remove("hidden");document.body.style.over
 function closeModal(id){$(id).classList.add("hidden");document.body.style.overflow=(["uploadModal","playerModal","profileModal","authModal"].every(mid=>$(mid).classList.contains("hidden")))?"":"hidden";}
 function toast(message){$("toast").textContent=message;$("toast").classList.remove("hidden");clearTimeout(toast.timer);toast.timer=setTimeout(()=>$("toast").classList.add("hidden"),3000);}
 function showUpload(){$("moderationResult").className="moderation-result hidden";openModal("uploadModal");}
-const MODERATION_ENDPOINT="https://us-central1-blutuub-1831a.cloudfunctions.net/moderateUpload";
+function moderationEndpoint(){return String(window.BluTuubModerationConfig?.endpoint||"").trim().replace(/\\/+$/,"");}
+async function checkModerationStatus(){
+ const badge=$("aiStatus");if(!badge)return;
+ const endpoint=moderationEndpoint();
+ if(!endpoint){badge.textContent="AI: setup needed";badge.className="ai-status setup";badge.title="Add your deployed Cloudflare Worker URL to moderation-config.js.";return;}
+ badge.textContent="AI: checking";badge.className="ai-status checking";
+ try{
+  const response=await fetch(endpoint+"/health",{method:"GET",cache:"no-store"});
+  const data=await response.json().catch(()=>({}));
+  if(response.ok&&data.online&&data.configured){badge.textContent="AI: online";badge.className="ai-status online";badge.title="Cloudflare AI moderation service is reachable.";}
+  else{badge.textContent="AI: offline";badge.className="ai-status offline";badge.title=data.error||"The moderation service is not configured.";}
+ }catch(error){badge.textContent="AI: offline";badge.className="ai-status offline";badge.title="Could not reach the Cloudflare moderation service.";}
+}
 function imageFileToJpeg(file){
  return new Promise((resolve,reject)=>{
   const url=URL.createObjectURL(file),img=new Image();
@@ -69,12 +81,12 @@ function sampleVideoFrames(file){
 async function moderateText(title,description,thumbnailFile,videoFile){
  if(title.trim().length<3)return {ok:false,message:"Please enter a longer title."};
  if(title.length>100||description.length>1000)return {ok:false,message:"Title must be 100 characters or fewer and description 1,000 characters or fewer."};
- if(!firebaseAuth||!firebaseAuth.currentUser)return {ok:false,message:"Sign in to BluTuub first to use AI moderation."};
+ const endpoint=moderationEndpoint();
+ if(!endpoint)return {ok:false,message:"Cloud AI moderation is not connected yet. Deploy the Cloudflare Worker and add its URL to moderation-config.js."};
  try{
   const frames=await sampleVideoFrames(videoFile);
   const thumbnail=thumbnailFile?await imageFileToJpeg(thumbnailFile):frames[0];
-  const token=await firebaseAuth.currentUser.getIdToken();
-  const response=await fetch(MODERATION_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({title,description,thumbnail,frames})});
+  const response=await fetch(endpoint+"/moderate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title,description,thumbnail,frames})});
   const data=await response.json().catch(()=>({}));
   if(!response.ok)return {ok:false,message:data.error||"AI moderation is not set up yet. Your upload was not added."};
   return {ok:!!data.ok,message:data.message||"AI moderation returned no explanation.",flagged:!!data.flagged,categories:Array.isArray(data.categories)?data.categories:[]};
@@ -97,6 +109,7 @@ async function handleAuthSubmit(event){event.preventDefault();if(!firebaseConfig
 
 loadProfiles();
 initFirebaseAuth();
+checkModerationStatus();
 $("editProfile").addEventListener("click",()=>{$("profileMenu").classList.add("hidden");if(onlineUser&&firebaseAuth){const p=activeProfile();$("displayNameInput").value=p.name;$("handleInput").value=p.handle;$("avatarColorInput").value=p.color;showProfileEditor(false);}else{showProfileEditor(false);}});
 $("switchProfile").addEventListener("click",()=>{$("profileMenu").classList.add("hidden");if(firebaseAuth){openAuth();}else{showProfileEditor(true);}});
 $("onlineAccountAction").addEventListener("click",()=>{$("profileMenu").classList.add("hidden");openAuth();});
