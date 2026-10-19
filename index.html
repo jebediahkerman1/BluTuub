@@ -70,7 +70,7 @@
    <label class="field-label" for="videoTitle">Title</label><input class="text-field" id="videoTitle" maxlength="100" placeholder="Add a title that describes your video" required>
    <label class="field-label" for="videoDescription">Description</label><textarea class="text-field" id="videoDescription" maxlength="1000" placeholder="Tell viewers about your video"></textarea>
    <label class="field-label" for="videoCategory">Category</label><select class="text-field" id="videoCategory"><option>Other</option><option>Gaming</option><option>Comedy</option><option>Music</option><option>Education</option><option>Animation</option></select>
-   <p class="note">Prototype note: uploads are only available in this browser session. The text check is a basic demo, not real AI moderation, and does not inspect video or audio.</p>
+   <p class="note">AI moderation checks the title and description after you sign in. Video files are still only previewed in this browser session; the video itself is not uploaded or checked.</p>
    <div id="moderationResult" class="moderation-result hidden" role="status"></div>
    <button class="blue-btn full-btn" type="submit">Check and add video</button>
   </form>
