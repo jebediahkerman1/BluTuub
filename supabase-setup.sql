@@ -24,10 +24,15 @@ as $$
 declare
   requested_name text;
   requested_username text;
+  base_username text;
 begin
   requested_name := coalesce(nullif(trim(new.raw_user_meta_data ->> 'display_name'), ''), 'BluTuub User');
   requested_username := lower(regexp_replace(coalesce(nullif(trim(new.raw_user_meta_data ->> 'username'), ''), split_part(new.email, '@', 1)), '[^a-zA-Z0-9_.]', '', 'g'));
   if length(requested_username) < 3 then requested_username := 'user' || substr(new.id::text, 1, 8); end if;
+  base_username := requested_username;
+  if exists (select 1 from public.profiles p where p.username = requested_username) then
+    requested_username := left(base_username, 15) || '_' || substr(new.id::text, 1, 8);
+  end if;
   insert into public.profiles (id, username, display_name)
   values (new.id, requested_username, requested_name)
   on conflict (id) do nothing;
