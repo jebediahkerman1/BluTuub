@@ -11,20 +11,26 @@ A blue-themed YouTube parody and video-sharing website prototype.
 ## Run the site
 Open `index.html` in a browser, or enable GitHub Pages in **Settings → Pages** and select the `main` branch and `/(root)`.
 
-## Set up and deploy AI moderation
+## Deploy AI moderation without installing anything on your PC
 
-The moderation backend is in `functions/index.js`. The OpenAI API key is stored as a Firebase Functions secret and must never be placed in public website files.
+The moderation backend is in `functions/index.js`. You can trigger deployment through GitHub Actions so Node.js and the Firebase CLI run on GitHub's cloud runner, not on your computer.
 
-1. Install Node.js 20 and the Firebase CLI.
-2. In a terminal at the repository root, run `npm install --global firebase-tools`.
-3. Run `firebase login`.
-4. Ensure Firebase project `blutuub-1831a` is on the Blaze (pay-as-you-go) plan if Firebase requires billing for Cloud Functions.
-5. Create an OpenAI API key in the OpenAI platform and keep it private.
-6. Run `firebase functions:secrets:set OPENAI_API_KEY` and paste the key when prompted.
-7. Run `firebase deploy --only functions`.
-8. Open BluTuub, sign in with Firebase, and try **Create**. AI moderation requires the function to be deployed and the OpenAI secret to be configured.
+### One-time browser setup
 
-If deployment asks you to enable APIs or billing, follow the Firebase Console instructions for project `blutuub-1831a`. Never paste your OpenAI API key into `script.js`, `index.html`, `firebase-config.js`, GitHub issues, or public chat.
+1. Create an OpenAI API key in the OpenAI platform. Keep it private.
+2. In your GitHub repository, open **Settings → Secrets and variables → Actions → New repository secret** and add a secret named `OPENAI_API_KEY` with your key as the value.
+3. In Google Cloud Console for Firebase project `blutuub-1831a`, create a service account for deployment and grant only the permissions needed to deploy Cloud Functions and manage its secret. Create a JSON key for that service account and copy the JSON securely.
+4. In GitHub **Settings → Secrets and variables → Actions**, add another repository secret named `FIREBASE_SERVICE_ACCOUNT` with the full service-account JSON as its value. Never commit that JSON file to the repository or share it publicly.
+5. Make sure Firebase project `blutuub-1831a` has billing enabled if Cloud Functions requires the Blaze pay-as-you-go plan. OpenAI's moderation endpoint itself is free, but Firebase hosting/compute and other cloud services may have charges.
+
+### Deploy from your browser
+
+1. Open the repository's **Actions** tab.
+2. Select **Deploy BluTuub AI moderation**.
+3. Click **Run workflow**, then **Run workflow** again to confirm.
+4. Wait for the workflow to finish successfully. If it fails, open the failed run's log for the setup step that needs attention.
+
+The workflow stores the OpenAI key in Firebase Secret Manager and deploys the function. The website will not be live-moderated until this workflow succeeds and Firebase Authentication is configured for the same project.
 
 ## Safety and prototype limits
 
