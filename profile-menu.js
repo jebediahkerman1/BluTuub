@@ -1,4 +1,4 @@
-// Independent profile drawer controller: works even if the main app script has an error.
+// Independent controller for the profile drawer.
 (function () {
   function initProfileDrawer() {
     const button = document.getElementById("profileButton");
@@ -17,49 +17,12 @@
       event.stopPropagation();
       setOpen(menu.classList.contains("hidden"));
     });
-
-    menu.addEventListener("click", function (event) {
-      event.stopPropagation();
-    });
-
+    menu.addEventListener("click", function (event) { event.stopPropagation(); });
     document.addEventListener("click", function (event) {
       if (!menu.contains(event.target) && !button.contains(event.target)) setOpen(false);
     });
-
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape") setOpen(false);
-    });
-
-    // Menu actions keep the drawer responsive even if the main app has not initialized.
-    const settings = document.getElementById("editProfile");
-    const switchAccount = document.getElementById("switchProfile");
-    const login = document.getElementById("onlineAccountAction");
-    if (settings) settings.addEventListener("click", function () {
-      setOpen(false);
-      const modal = document.getElementById("profileModal");
-      const form = document.getElementById("profileForm");
-      const list = document.getElementById("switchList");
-      const title = document.getElementById("profileTitle");
-      if (modal) modal.classList.remove("hidden");
-      if (form) form.classList.remove("hidden");
-      if (list) list.classList.add("hidden");
-      if (title) title.textContent = "Edit your profile";
-    });
-    if (switchAccount) switchAccount.addEventListener("click", function () {
-      setOpen(false);
-      const modal = document.getElementById("profileModal");
-      const form = document.getElementById("profileForm");
-      const list = document.getElementById("switchList");
-      const title = document.getElementById("profileTitle");
-      if (modal) modal.classList.remove("hidden");
-      if (form) form.classList.add("hidden");
-      if (list) list.classList.remove("hidden");
-      if (title) title.textContent = "Switch account";
-    });
-    if (login) login.addEventListener("click", function () {
-      setOpen(false);
-      const modal = document.getElementById("authModal");
-      if (modal) modal.classList.remove("hidden");
     });
   }
 
