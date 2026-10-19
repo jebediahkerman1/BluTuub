@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#168de2">
+  <title>BluTuub — Videos for everyone</title>
+  <meta name="description" content="BluTuub is a blue-themed video sharing parody. Watch, discover, and submit videos for moderation.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <button class="icon-btn menu-btn" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a class="brand" href="#" aria-label="BluTuub home"><span class="brand-mark"><span></span></span><span>Blu<span>Tuub</span></span></a>
+    <form class="search" id="searchForm"><input id="searchInput" type="search" placeholder="Search videos" aria-label="Search videos"><button aria-label="Search">⌕</button></form>
+    <div class="top-actions"><button class="upload-top" id="openUpload">＋ <span>Create</span></button><button class="avatar" title="Demo profile">B</button></div>
+  </header>
+  <aside class="sidebar" id="sidebar">
+    <button class="nav-item active" data-filter="All"><span>⌂</span> Home</button>
+    <button class="nav-item" data-filter="Trending"><span>↗</span> Trending</button>
+    <button class="nav-item" data-filter="Gaming"><span>🎮</span> Gaming</button>
+    <button class="nav-item" data-filter="Music"><span>♫</span> Music</button>
+    <button class="nav-item" data-filter="Comedy"><span>☻</span> Comedy</button>
+    <button class="nav-item" data-filter="Education"><span>▤</span> Learning</button>
+    <div class="side-divider"></div>
+    <p class="side-heading">YOUR BLUTUUB</p>
+    <button class="nav-item" id="myVideos"><span>▣</span> Your videos</button>
+    <button class="nav-item" id="openUploadSide"><span>⊕</span> Upload video</button>
+    <div class="side-note"><strong>BluTuub Studio</strong><p>Share your videos with the world. Every submission gets a moderation check in this demo.</p><span class="beta-pill">BETA EXPERIENCE</span></div>
+  </aside>
+  <main class="main">
+    <div class="chips" id="chips"><button class="chip selected" data-filter="All">All</button><button class="chip" data-filter="Gaming">Gaming</button><button class="chip" data-filter="Comedy">Comedy</button><button class="chip" data-filter="Music">Music</button><button class="chip" data-filter="Education">Education</button><button class="chip" data-filter="Animation">Animation</button><button class="chip" data-filter="Trending">Trending</button></div>
+    <section class="welcome">
+      <div><span class="eyebrow"><span class="live-dot"></span> YOUR NEXT FAVORITE VIDEO</span><h1>Good videos.<br><span>Blue vibes.</span></h1><p>Find something funny, learn something new, or upload your own masterpiece.</p><button class="primary-btn" id="heroUpload">＋ Upload a video</button></div>
+      <div class="welcome-art" aria-hidden="true"><div class="art-circle"></div><div class="art-play">▶</div><span class="art-spark spark-one">✦</span><span class="art-spark spark-two">✧</span><span class="art-label">PLAY SOMETHING GOOD</span></div>
+    </section>
+    <div class="section-head"><div><h2 id="feedTitle">Recommended for you</h2><p id="feedSubtitle">A little bit of everything.</p></div><span class="count-label" id="videoCount">6 VIDEOS</span></div>
+    <div class="video-grid" id="videoGrid"></div>
+    <div class="empty-state hidden" id="emptyState"><div class="empty-icon">⌕</div><h3>No videos found</h3><p>Try another search or category.</p><button class="secondary-btn" id="clearSearch">Clear filters</button></div>
+    <footer><a class="footer-brand" href="#"><span class="mini-mark">▶</span> BluTuub</a><span>Just a video-sharing parody project.</span><span>© 2026 BluTuub</span></footer>
+  </main>
+  <div class="modal-backdrop hidden" id="uploadModal" role="dialog" aria-modal="true" aria-labelledby="uploadTitle">
+    <div class="modal upload-modal"><button class="close-btn" data-close="uploadModal" aria-label="Close">×</button><div class="modal-kicker">BLUTUUB STUDIO</div><h2 id="uploadTitle">Upload a video</h2><p class="modal-intro">Add your details. Our demo moderation checker reviews the text before the video can appear in the feed.</p>
+      <form id="uploadForm">
+        <label class="file-drop" for="videoFile"><span class="file-icon">↑</span><strong id="fileLabel">Choose a video file</strong><small>MP4, WebM, or another browser-supported format</small><input type="file" id="videoFile" accept="video/*" required></label>
+        <label class="field-label" for="videoTitle">Video title</label><input class="text-field" id="videoTitle" maxlength="100" placeholder="Give your video a title" required>
+        <label class="field-label" for="videoDescription">Description</label><textarea class="text-field description-field" id="videoDescription" maxlength="1000" placeholder="What's your video about?"></textarea>
+        <label class="field-label" for="videoCategory">Category</label><select class="text-field" id="videoCategory"><option>Gaming</option><option>Comedy</option><option>Music</option><option>Education</option><option>Animation</option><option>Other</option></select>
+        <div class="moderation-info"><span>✦</span><div><strong>AI moderation demo</strong><p>This prototype uses a basic text-rule check, not a real AI service. It does not analyze video frames or audio.</p></div></div>
+        <div id="moderationResult" class="moderation-result hidden" role="status"></div>
+        <button class="primary-btn full-btn" id="submitUpload" type="submit">Check & submit video</button>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop hidden" id="playerModal" role="dialog" aria-modal="true" aria-label="Video player"><div class="modal player-modal"><button class="close-btn player-close" data-close="playerModal" aria-label="Close">×</button><div id="playerContent"></div></div></div>
+  <div class="toast hidden" id="toast" role="status"></div>
+  <script src="script.js"></script>
+</body>
+</html>
