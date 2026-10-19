@@ -77,13 +77,13 @@
  </section>
 </div>
 <div class="modal-backdrop hidden" id="playerModal" role="dialog" aria-modal="true" aria-label="Video player"><section class="modal player-modal"><button class="close-btn" data-close="playerModal" aria-label="Close">×</button><div id="playerContent"></div></section></div>
-<div class="profile-menu hidden" id="profileMenu" role="menu">
+<aside class="profile-menu hidden" id="profileMenu" aria-label="Account menu">
+  <div class="profile-panel-title">Account</div>
   <div class="profile-menu-head"><div class="profile-avatar profile-avatar-large" id="menuAvatar">A</div><div><strong id="menuDisplayName">BluTuub User</strong><span id="menuHandle">@blutuubuser</span></div></div>
-  <button id="switchProfile" role="menuitem">Switch account</button>
-  <button id="editProfile" role="menuitem">Edit profile</button>
-  <button id="signOutProfile" role="menuitem">Sign out</button>
-  <button id="onlineAccountAction" role="menuitem">Sign in / Create account</button>
-</div>
+  <button id="editProfile" type="button"><span class="account-menu-icon">⚙</span>Settings</button>
+  <button id="switchProfile" type="button"><span class="account-menu-icon">⇄</span>Switch account</button>
+  <button id="onlineAccountAction" type="button"><span class="account-menu-icon">↪</span>Log in</button>
+</aside>
 <div class="modal-backdrop hidden" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
  <section class="modal profile-modal">
   <div class="modal-head"><h2 id="profileTitle">Your BluTuub profile</h2><button class="close-btn" data-close="profileModal" aria-label="Close">×</button></div>
